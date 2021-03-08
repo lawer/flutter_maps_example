@@ -77,9 +77,11 @@ class _MyHomePageState extends State<MyHomePage> {
       var marker = Marker(
           point: LatLng(double.parse(bici.lat), double.parse(bici.lon)),
           builder: (ctx) => Container(
-                child: FlutterLogo(),
-              )
-      );
+                child: Icon(
+                  Icons.pin_drop,
+                  color: Colors.blue.shade600,
+                ),
+              ));
 
       markers.add(marker);
     }
