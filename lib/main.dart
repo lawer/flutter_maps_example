@@ -52,7 +52,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Bici> bicis = [];
   List<Marker> markers = [];
 
   Future<void> _downloadData() async {
@@ -66,15 +65,15 @@ class _MyHomePageState extends State<MyHomePage> {
     Map<String, dynamic> data = results["data"];
     List<dynamic> bicisJson = data["bici"];
 
-    bicis.clear();
-    markers.clear();
+    List<Bici> _bicis = [];
+    List<Marker> _markers = [];
 
     for (var o in bicisJson) {
       var bici = Bici.fromJson(o);
-      bicis.add(bici);
+      _bicis.add(bici);
     }
 
-    for (var bici in bicis) {
+    for (var bici in _bicis) {
       var marker = Marker(
           point: LatLng(double.parse(bici.lat), double.parse(bici.lon)),
           builder: (ctx) => Container(
@@ -91,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      bicis;
+      _markers = markers;
     });
   }
 
