@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -81,9 +82,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   Icons.pin_drop,
                   color: Colors.blue.shade600,
                 ),
-              ));
+              )
+      );
 
-      markers.add(marker);
+      _markers.add(marker);
     }
 
     setState(() {
@@ -92,8 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _markers = markers;
+      markers = _markers;
     });
+
+    print(_bicis);
+    print(markers);
   }
 
   @override
@@ -117,14 +122,25 @@ class _MyHomePageState extends State<MyHomePage> {
         options: MapOptions(
           center: LatLng(41.39843017161212, 2.203274055678667),
           zoom: 14.0,
+          plugins: [
+            MarkerClusterPlugin(),
+          ],
         ),
         layers: [
           TileLayerOptions(
               urlTemplate:
                   "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
               subdomains: ['a', 'b', 'c']),
-          MarkerLayerOptions(
+          MarkerClusterLayerOptions(
+            maxClusterRadius: 120,
+            size: Size(40, 40),
             markers: markers,
+            builder: (context, markers) {
+              return FloatingActionButton(
+                child: Text(markers.length.toString()),
+                onPressed: null,
+              );
+            },
           ),
         ],
       )),
