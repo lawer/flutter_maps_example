@@ -182,28 +182,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           body: TabBarView(
             children: [
-              MyMap(markers: markers),
-              Container(
-                child: FutureBuilder(
-                  future: database.collection("instituts").get(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      var data = snapshot.data;
-                      var docs = data.docs;
-                      return ListView.separated(
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(),
-                          padding: const EdgeInsets.all(8),
-                          itemCount: data.size,
-                          itemBuilder: (context, index) {
-                            return ListTile(title: Text(docs[index]['nom']));
-                          });
-                    } else {
-                      return Text("Loading...");
-                    }
-                  },
-                ),
-              )
+              MapTab(markers: markers),
+              ListTab(database: database)
             ],
           ),
           floatingActionButton: FloatingActionButton(
@@ -215,8 +195,42 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class MyMap extends StatelessWidget {
-  const MyMap({
+class ListTab extends StatelessWidget {
+  const ListTab({
+    Key key,
+    @required this.database,
+  }) : super(key: key);
+
+  final FirebaseFirestore database;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: FutureBuilder(
+        future: database.collection("instituts").get(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var data = snapshot.data;
+            var docs = data.docs;
+            return ListView.separated(
+                separatorBuilder: (BuildContext context, int index) =>
+                    const Divider(),
+                padding: const EdgeInsets.all(8),
+                itemCount: data.size,
+                itemBuilder: (context, index) {
+                  return ListTile(title: Text(docs[index]['nom']));
+                });
+          } else {
+            return Text("Loading...");
+          }
+        },
+      ),
+    );
+  }
+}
+
+class MapTab extends StatelessWidget {
+  const MapTab({
     Key key,
     @required this.markers,
   }) : super(key: key);
