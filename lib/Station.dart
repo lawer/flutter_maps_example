@@ -26,7 +26,7 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     if (json['bici'] != null) {
-      bici = new List<Bici>();
+      bici = [];
       json['bici'].forEach((v) {
         bici.add(new Bici.fromJson(v));
       });

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_auth_ui/flutter_auth_ui.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong/latlong.dart';
@@ -10,7 +9,11 @@ import 'Station.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_auth_ui/flutter_auth_ui.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +55,10 @@ class MyApp extends StatelessWidget {
       }
     });
 
+    var database = FirebaseFirestore.instance;
+
+    incCounter(database);
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -68,6 +75,25 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
+  }
+
+  void incCounter(FirebaseFirestore database) {
+    var collection = database.collection('counter');
+    var result = collection.get();
+    result.then((QuerySnapshot querySnapshot) {
+      print(querySnapshot.size);
+
+      if(querySnapshot.size == 0) {
+        collection.add({"counter": 0});
+      } else {
+        var document = querySnapshot.docs.first;
+        var data = document.data();
+
+        collection
+            .doc(document.id)
+            .set({"counter": data["counter"] + 1});
+      }
+    });
   }
 }
 
@@ -93,7 +119,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Marker> markers = [];
 
   Future<void> _downloadData() async {
-    var url = 'http://barcelonaapi.marcpous.com/bicing/stations.json';
     Uri uri = Uri.http("barcelonaapi.marcpous.com", "bicing/stations.json");
 
     var result = await http.get(uri);
