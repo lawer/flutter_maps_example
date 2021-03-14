@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth_ui/flutter_auth_ui.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong/latlong.dart';
@@ -7,14 +8,50 @@ import 'dart:convert';
 
 import 'Station.dart';
 
-void main() {
+// Import the firebase_core plugin
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
+Future<bool> doAuth() async {
+  // Set provider
+  final providers = [
+    AuthUiItem.AuthAnonymous,
+    AuthUiItem.AuthEmail,
+    AuthUiItem.AuthGoogle,
+  ];
+
+  return await FlutterAuthUi.startUi(
+    items: providers,
+    tosAndPrivacyPolicy: TosAndPrivacyPolicy(
+      tosUrl: "https://www.google.com",
+      privacyPolicyUrl: "https://www.google.com",
+    ),
+    androidOption: AndroidOption(
+      enableSmartLock: false, // default true
+    )
+  );
+}
+
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    FirebaseAuth.instance
+        .userChanges()
+        .listen((User user) {
+      if (user == null) {
+        print('User is currently signed out!');
+        doAuth();
+      } else {
+        print('User is signed in!');
+      }
+    });
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
